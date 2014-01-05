@@ -16,7 +16,7 @@ class Emacs < Formula
   option "japanese", "Patch for Japanese input methods"
 
   if build.include? "use-git-head"
-    head 'http://git.sv.gnu.org/r/emacs.git', :branch => 'xwidget'
+    head 'http://git.sv.gnu.org/r/emacs.git', :branch => 'xwidget' ## mc: this formular is too new for this old branch
 # :revision => 'e34770e73b4c27fc49ed784bc22019278f968cf8' 
 # 'e34770e73b4c27fc49ed784bc22019278f968cf8'
   else
