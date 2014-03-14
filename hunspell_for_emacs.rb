@@ -1,6 +1,6 @@
 require 'formula'
 
-class Hunspell-FOR-EMACS < Formula
+class Hunspell_for_emacs < Formula
   homepage 'http://hunspell.sourceforge.net/'
   url 'https://downloads.sourceforge.net/hunspell/hunspell-1.3.2.tar.gz'
   sha1 '902c76d2b55a22610e2227abc4fd26cbe606a51c'
