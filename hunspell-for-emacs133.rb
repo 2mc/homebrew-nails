@@ -73,117 +73,117 @@ __END__
  
  	if (showpath) {
 
---- src/parsers/textparser.cxx
-+++ src/parsers/textparser.cxx
-@@ -96,7 +96,9 @@ void TextParser::init(const char * wordchars)
- 	}
- 	actual = 0;
- 	head = 0;
-+	head_char = 0;
- 	token = 0;
-+	token_char = 0;
- 	state = 0;
-         utf8 = 0;
-         checkurl = 0;
-@@ -117,7 +119,9 @@ void TextParser::init(unsigned short * wc, int len)
- 	}
- 	actual = 0;
- 	head = 0;
-+	head_char = 0;
- 	token = 0;
-+	token_char = 0;
- 	state = 0;
- 	utf8 = 1;
- 	checkurl = 0;
-@@ -143,7 +147,9 @@ void TextParser::put_line(char * word)
- 	actual = (actual + 1) % MAXPREVLINE;
- 	strcpy(line[actual], word);
- 	token = 0;
-+	token_char = 0;
- 	head = 0;
-+	head_char = 0;
- 	check_urls();
- }
+# --- src/parsers/textparser.cxx
+# +++ src/parsers/textparser.cxx
+# @@ -96,7 +96,9 @@ void TextParser::init(const char * wordchars)
+#  	}
+#  	actual = 0;
+#  	head = 0;
+# +	head_char = 0;
+#  	token = 0;
+# +	token_char = 0;
+#  	state = 0;
+#          utf8 = 0;
+#          checkurl = 0;
+# @@ -117,7 +119,9 @@ void TextParser::init(unsigned short * wc, int len)
+#  	}
+#  	actual = 0;
+#  	head = 0;
+# +	head_char = 0;
+#  	token = 0;
+# +	token_char = 0;
+#  	state = 0;
+#  	utf8 = 1;
+#  	checkurl = 0;
+# @@ -143,7 +147,9 @@ void TextParser::put_line(char * word)
+#  	actual = (actual + 1) % MAXPREVLINE;
+#  	strcpy(line[actual], word);
+#  	token = 0;
+# +	token_char = 0;
+#  	head = 0;
+# +	head_char = 0;
+#  	check_urls();
+#  }
  
-@@ -168,15 +174,21 @@ char * TextParser::next_token()
- 			if (is_wordchar(line[actual] + head)) {
- 				state = 1;
- 				token = head;
-+				token_char = head_char;
- 			} else if ((latin1 = get_latin1(line[actual] + head))) {
- 				state = 1;
- 				token = head;
--				head += strlen(latin1);
-+				token_char = head_char;
-+				int latin1_len = strlen(latin1);
-+				head += latin1_len;
-+				head_char += latin1_len;
- 			}
- 			break;
- 		case 1: // wordchar
- 			if ((latin1 = get_latin1(line[actual] + head))) {
--				head += strlen(latin1);
-+				int latin1_len = strlen(latin1);
-+				head += latin1_len;
-+				head_char += latin1_len;
- 			} else if (! is_wordchar(line[actual] + head)) {
- 				state = 0;
- 				char * t = alloc_token(token, &head);
-@@ -184,7 +196,9 @@ char * TextParser::next_token()
- 			}
- 			break;
- 		}
--                if (next_char(line[actual], &head)) return NULL;
-+		int nc_result = next_char(line[actual], &head);
-+		head_char++;
-+                if (nc_result) return NULL;
- 	}
- }
+# @@ -168,15 +174,21 @@ char * TextParser::next_token()
+#  			if (is_wordchar(line[actual] + head)) {
+#  				state = 1;
+#  				token = head;
+# +				token_char = head_char;
+#  			} else if ((latin1 = get_latin1(line[actual] + head))) {
+#  				state = 1;
+#  				token = head;
+# -				head += strlen(latin1);
+# +				token_char = head_char;
+# +				int latin1_len = strlen(latin1);
+# +				head += latin1_len;
+# +				head_char += latin1_len;
+#  			}
+#  			break;
+#  		case 1: // wordchar
+#  			if ((latin1 = get_latin1(line[actual] + head))) {
+# -				head += strlen(latin1);
+# +				int latin1_len = strlen(latin1);
+# +				head += latin1_len;
+# +				head_char += latin1_len;
+#  			} else if (! is_wordchar(line[actual] + head)) {
+#  				state = 0;
+#  				char * t = alloc_token(token, &head);
+# @@ -184,7 +196,9 @@ char * TextParser::next_token()
+#  			}
+#  			break;
+#  		}
+# -                if (next_char(line[actual], &head)) return NULL;
+# +		int nc_result = next_char(line[actual], &head);
+# +		head_char++;
+# +                if (nc_result) return NULL;
+#  	}
+#  }
  
-@@ -193,6 +207,12 @@ int TextParser::get_tokenpos()
- 	return token;
- }
+# @@ -193,6 +207,12 @@ int TextParser::get_tokenpos()
+#  	return token;
+#  }
  
-+int TextParser::get_token_charpos()
-+{
-+	return token_char;
-+}
-+
-+
- int TextParser::change_token(const char * word)
- {
- 	if (word) {
-@@ -200,6 +220,7 @@ int TextParser::change_token(const char * word)
- 		strcpy(line[actual] + token, word);
- 		strcat(line[actual], r);
- 		head = token;
-+		head_char = token_char;
- 		free(r);
- 		return 1;
- 	}
+# +int TextParser::get_token_charpos()
+# +{
+# +	return token_char;
+# +}
+# +
+# +
+#  int TextParser::change_token(const char * word)
+#  {
+#  	if (word) {
+# @@ -200,6 +220,7 @@ int TextParser::change_token(const char * word)
+#  		strcpy(line[actual] + token, word);
+#  		strcat(line[actual], r);
+#  		head = token;
+# +		head_char = token_char;
+#  		free(r);
+#  		return 1;
+#  	}
 
---- src/parsers/textparser.hxx
-+++ src/parsers/textparser.hxx
-@@ -41,6 +41,10 @@ protected:
-   unsigned short *    wordchars_utf16;
-   int                 wclen;
+# --- src/parsers/textparser.hxx
+# +++ src/parsers/textparser.hxx
+# @@ -41,6 +41,10 @@ protected:
+#    unsigned short *    wordchars_utf16;
+#    int                 wclen;
  
-+  // for tracking UTF-8 character positions
-+  int                 head_char;
-+  int                 token_char;
-+    
- public:
+# +  // for tracking UTF-8 character positions
+# +  int                 head_char;
+# +  int                 token_char;
+# +    
+#  public:
   
-   TextParser();
-@@ -56,6 +60,8 @@ public:
-   void                set_url_checking(int check);
+#    TextParser();
+# @@ -56,6 +60,8 @@ public:
+#    void                set_url_checking(int check);
  
-   int                 get_tokenpos();
-+  int                 get_token_charpos();  
-+    
-   int                 is_wordchar(char * w);
-   const char *        get_latin1(char * s);
-   char *              next_char();
+#    int                 get_tokenpos();
+# +  int                 get_token_charpos();  
+# +    
+#    int                 is_wordchar(char * w);
+#    const char *        get_latin1(char * s);
+#    char *              next_char();
 
 
 --- src/tools/hunspell.cxx
