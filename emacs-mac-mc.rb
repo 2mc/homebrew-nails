@@ -72,7 +72,18 @@ class EmacsMacMc < Formula
       "--enable-mac-app=#{prefix}",
     ]
 
+
     args << "--with-file-notification=gfile" if build.with? "glib"
+	
+	if build.with? "gnutls"
+      args << "--with-gnutls"
+    else
+      args << "--without-gnutls"
+    end
+
+    args << "--with-rsvg" if build.with? "librsvg"
+    args << "--with-imagemagick" if build.with? "imagemagick"
+
 
     # icons
     icons_dir = "./mac/Emacs.app/Contents/Resources"
