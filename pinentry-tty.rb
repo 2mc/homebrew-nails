@@ -22,7 +22,7 @@ class PinentryTTY < Formula
                           "--prefix=#{prefix}",
                           "--disable-pinentry-qt4",
                           "--disable-pinentry-gtk2",
-                          "--disable-pinentry-gnome3"
+                          "--disable-pinentry-gnome3",
                           "--enable-pinentry-tty"
     system "make", "install"
   end
