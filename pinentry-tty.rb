@@ -1,4 +1,4 @@
-class PinentryTTY < Formula
+class PinentryTty < Formula
   desc "Passphrase entry dialog utilizing the Assuan protocol"
   homepage "https://www.gnupg.org/related_software/pinentry/index.en.html"
   url "ftp://ftp.gnupg.org/gcrypt/pinentry/pinentry-0.9.5.tar.bz2"
