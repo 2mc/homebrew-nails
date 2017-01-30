@@ -3,7 +3,7 @@ require 'formula'
 class HunspellForEmacs < Formula
   homepage 'http://hunspell.sourceforge.net/'
   url 'https://downloads.sourceforge.net/hunspell/hunspell-1.3.2.tar.gz'
-  sha1 '902c76d2b55a22610e2227abc4fd26cbe606a51c'
+  sha256 'b4edd4a4ee944cb9f485b35473e46b729ed768e9d24da8e78e4c4c6ca56addbd'
 
   depends_on 'readline'
 
